@@ -8,6 +8,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
@@ -69,10 +70,23 @@ public class Person extends RealmObject {
     static void updatePersons(List<Eddystone> eddystones, Realm realm) {
         realm.beginTransaction();
 
-        realm.where(Person.class).isNull("accountName").findAll().clear();
-        for (Person p : realm.where(Person.class).isNotNull("accountName").findAll()) {
-            p.setLastSignalStrength(Integer.MIN_VALUE);
+        RealmResults<Person> persons = realm.where(Person.class).findAll();
+        for (Person person : persons) {
+            boolean contained = false;
+            for (Eddystone eddystone : eddystones) {
+                if (person.getMacAddress().equals(eddystone.macAddress.toString())) {
+                    contained = true;
+                }
+            }
+            if (!contained) {
+                Person update = person;
+                person.setLastSignalStrength(Integer.MIN_VALUE);
+
+                // Persist your data easily
+                realm.copyToRealmOrUpdate(update);
+            }
         }
+
         for (Eddystone eddystone : eddystones) {
             // Update the person in our database
 
