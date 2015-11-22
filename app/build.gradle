@@ -34,4 +34,5 @@ dependencies {
     compile 'com.estimote:sdk:0.9.4@aar'
     compile 'io.realm:realm-android:0.85.0'
     compile 'com.google.android.gms:play-services-identity:8.3.0'
+    compile 'com.android.support:design:23.1.1'
 }

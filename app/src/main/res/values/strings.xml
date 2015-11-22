@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BLE Vienna</string>
+    <string name="title_activity_main">BLE Vienna</string>
+    <string name="action_settings">Settings</string>
 </resources>

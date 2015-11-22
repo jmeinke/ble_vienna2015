@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.eddystone.Eddystone;
@@ -23,7 +24,7 @@ import io.realm.RealmResults;
 import static java.lang.System.currentTimeMillis;
 
 
-public class RangingActivity extends AppCompatActivity implements BeaconManager.EddystoneListener {
+public class RangingActivity extends AppCompatActivity implements BeaconManager.EddystoneListener, ItemClickListener {
     protected static final String TAG = "RangingActivity";
     private BeaconManager beaconManager;
     private PersonAdapter personAdapter;
@@ -48,6 +49,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
         rv.setHasFixedSize(true);
 
         personAdapter = new PersonAdapter(new ArrayList<Person>());
+        personAdapter.setListener(this);
         rv.setAdapter(personAdapter);
         queryPersonsAndUpdateList();
 
@@ -137,5 +139,10 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onItemClick(View v, int position) {
+        
     }
 }
