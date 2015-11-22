@@ -77,6 +77,17 @@ public class MainActivity extends AppCompatActivity implements BeaconManager.Edd
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                scanId = beaconManager.startEddystoneScanning();
+            }
+        });
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         // Should be invoked in #onStop.
