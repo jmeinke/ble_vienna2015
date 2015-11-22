@@ -36,13 +36,16 @@ interface CalendarEventDelegate {
     void calendarDidLoadEvents(Calendar cal, List<String> events);
 }
 public class Calendar {
-    private Person person;
+    public Person person;
+    public int index;
     private GoogleAccountCredential mCredential;
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
 
     public CalendarEventDelegate delegate;
-    public Calendar(Person person, Context context) {
+    public Calendar(Person person, int idx, Context context) {
+        this.person = person;
+        this.index = idx;
         mCredential = Calendar.getCredential(context).setSelectedAccountName(person.getAccountName());
     }
 

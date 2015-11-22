@@ -29,10 +29,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MonitoringActivity"
-            android:label="Monitoring">
-        </activity>
-        <activity
             android:name=".RangingActivity"
             android:label="@string/action_settings">
         </activity>
