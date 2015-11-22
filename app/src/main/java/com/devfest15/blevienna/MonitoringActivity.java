@@ -4,6 +4,8 @@ package com.devfest15.blevienna;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import org.altbeacon.beacon.BeaconConsumer;
@@ -20,6 +22,13 @@ public class MonitoringActivity extends AppCompatActivity implements BeaconConsu
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranging);
+
+        RecyclerView rv = (RecyclerView)findViewById(R.id.rv);
+        rv.setHasFixedSize(true);
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        rv.setLayoutManager(llm);
+
         beaconManager = BeaconManager.getInstanceForApplication(this);
         // To detect proprietary beacons, you must add a line like below corresponding to your beacon
         // type.  Do a web search for "setBeaconLayout" to get the proper expression.
