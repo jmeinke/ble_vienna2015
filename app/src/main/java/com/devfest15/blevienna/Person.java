@@ -3,6 +3,7 @@ package com.devfest15.blevienna;
 
 import com.estimote.sdk.eddystone.Eddystone;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,8 +69,7 @@ public class Person extends RealmObject {
     }
 
     static void updatePersons(List<Eddystone> eddystones, Realm realm) {
-        realm.beginTransaction();
-
+        ArrayList<Person> update = new ArrayList<>();
         RealmResults<Person> persons = realm.where(Person.class).findAll();
         for (Person person : persons) {
             boolean contained = false;
@@ -79,12 +79,22 @@ public class Person extends RealmObject {
                 }
             }
             if (!contained) {
-                Person update = person;
-                person.setLastSignalStrength(Integer.MIN_VALUE);
+                Person newPerson = new Person();
+                newPerson.setMacAddress(person.getMacAddress());
+                newPerson.setLastSeen(person.getLastSeen());
+                newPerson.setAccountName(person.getAccountName());
+                newPerson.setName(person.getName());
+                newPerson.setLastSignalStrength(Integer.MIN_VALUE);
 
-                // Persist your data easily
-                realm.copyToRealmOrUpdate(update);
+                update.add(newPerson);
             }
+        }
+
+        for (Person p : update) {
+            // Persist your data easily
+            realm.beginTransaction();
+            realm.copyToRealmOrUpdate(p);
+            realm.commitTransaction();
         }
 
         for (Eddystone eddystone : eddystones) {
@@ -96,8 +106,9 @@ public class Person extends RealmObject {
             person.setLastSeen(new Date(currentTimeMillis()));
 
             // Persist your data easily
+            realm.beginTransaction();
             realm.copyToRealmOrUpdate(person);
+            realm.commitTransaction();
         }
-        realm.commitTransaction();
     }
 }
