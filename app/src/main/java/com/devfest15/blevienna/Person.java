@@ -70,6 +70,7 @@ public class Person extends RealmObject {
 
     static void updatePersons(List<Eddystone> eddystones, Realm realm) {
         ArrayList<Person> update = new ArrayList<>();
+
         RealmResults<Person> persons = realm.where(Person.class).findAll();
         for (Person person : persons) {
             boolean contained = false;
@@ -78,6 +79,7 @@ public class Person extends RealmObject {
                     contained = true;
                 }
             }
+
             if (!contained) {
                 Person newPerson = new Person();
                 newPerson.setMacAddress(person.getMacAddress());
@@ -102,13 +104,15 @@ public class Person extends RealmObject {
 
 
             Person person = realm.where(Person.class).equalTo("macAddress", eddystone.macAddress.toString()).findFirst();
+            realm.beginTransaction();
+            
             if (person == null) person = new Person();
             person.setMacAddress(eddystone.macAddress.toString());
             person.setLastSignalStrength(eddystone.rssi);
             person.setLastSeen(new Date(currentTimeMillis()));
 
             // Persist your data easily
-            realm.beginTransaction();
+
             realm.copyToRealmOrUpdate(person);
             realm.commitTransaction();
         }
