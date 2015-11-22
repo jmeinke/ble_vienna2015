@@ -1,56 +1,90 @@
 package com.devfest15.blevienna;
 
 
-import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
-import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconConsumer;
-import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.RangeNotifier;
-import org.altbeacon.beacon.Region;
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.eddystone.Eddystone;
+import io.realm.Realm;
+
+import static java.lang.System.currentTimeMillis;
 
 
-public class RangingActivity extends AppCompatActivity implements BeaconConsumer {
+public class RangingActivity extends AppCompatActivity implements BeaconManager.EddystoneListener {
     protected static final String TAG = "RangingActivity";
     private BeaconManager beaconManager;
+    private String scanId;
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranging);
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-        // To detect proprietary beacons, you must add a line like below corresponding to your beacon
-        // type.  Do a web search for "setBeaconLayout" to get the proper expression.
-        // beaconManager.getBeaconParsers().add(new BeaconParser().
-        //        setBeaconLayout("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
-        beaconManager.bind(this);
+
+        // Get a Realm instance for this thread
+        realm = Realm.getInstance(this);
+
+        RecyclerView rv = (RecyclerView)findViewById(R.id.rv);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        rv.setLayoutManager(llm);
+        rv.setHasFixedSize(true);
+
+        beaconManager = new BeaconManager(this);
+
+        // Should be invoked in #onCreate.
+        beaconManager.setEddystoneListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Should be invoked in #onStart.
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                scanId = beaconManager.startEddystoneScanning();
+            }
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Should be invoked in #onStop.
+        beaconManager.stopEddystoneScanning(scanId);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        beaconManager.unbind(this);
+        // Should be invoked in #onStop.
+        beaconManager.stopEddystoneScanning(scanId);
     }
 
     @Override
-    public void onBeaconServiceConnect() {
-        beaconManager.setRangeNotifier(new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
-                    Log.i(TAG, "The first beacon I see is about " + beacons.iterator().next().getDistance() +
-                            " meters away.");
-                }
-            }
-        });
+    public void onEddystonesFound(List<Eddystone> eddystones) {
+        if (eddystones.isEmpty())
+            return;
 
-        try {
-            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-        } catch (RemoteException e) {    }
+        for (Eddystone eddystone : eddystones) {
+            // Update the person in our database
+
+            Person person = new Person();
+            person.setBeaconId(eddystone.macAddress.toString());
+            person.setLastSignalStrength(eddystone.rssi);
+            person.setLastSeen(new Date(currentTimeMillis()));
+
+            // Persist your data easily
+            realm.beginTransaction();
+            realm.copyToRealm(person);
+            realm.commitTransaction();
+        }
     }
 }

@@ -16,7 +16,8 @@ public class Person extends RealmObject {
     @PrimaryKey
     private String beaconId;
     private String name;
-    private String lastDistance;
+    private String accountName;
+    private int lastSignalStrength;
     private Date lastSeen;
 
     public String getBeaconId() {
@@ -35,12 +36,12 @@ public class Person extends RealmObject {
         this.name = name;
     }
 
-    public String getLastDistance() {
-        return lastDistance;
+    public int getLastSignalStrength() {
+        return lastSignalStrength;
     }
 
-    public void setLastDistance(String lastDistance) {
-        this.lastDistance = lastDistance;
+    public void setLastSignalStrength(int lastDistance) {
+        this.lastSignalStrength = lastDistance;
     }
 
     public Date getLastSeen() {
@@ -49,5 +50,13 @@ public class Person extends RealmObject {
 
     public void setLastSeen(Date lastSeen) {
         this.lastSeen = lastSeen;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 }
