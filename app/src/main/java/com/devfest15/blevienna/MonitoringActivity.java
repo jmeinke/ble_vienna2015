@@ -11,7 +11,6 @@ import io.realm.RealmResults;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 
 
 public class MonitoringActivity extends AppCompatActivity implements CalendarEventDelegate {
@@ -24,28 +23,24 @@ public class MonitoringActivity extends AppCompatActivity implements CalendarEve
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realm = Realm.getInstance(this);
-
     }
 
     @Override
     public void eventsLoaded(List<String> events) {
-
+            //TODO: show UI
     }
 
+    private void updateCalendar() {
+        RealmQuery<Person> query = realm.where(Person.class);
 
-    class MonitorTask extends TimerTask {
-        @Override
-        public void run() {
-            RealmQuery<Person> query = realm.where(Person.class);
-
-            query.isNotNull("accountName");
+        query.isNotNull("accountName");
 
 
-            RealmResults<Person> persons = query.findAllSorted("lastSignalStrength", false);
-            calendarList = new ArrayList<>();
-            for (Person p : persons) {
-                calendarList.add(new Calendar(p, getApplicationContext()));
-            }
+        RealmResults<Person> persons = query.findAllSorted("lastSignalStrength", false);
+        calendarList = new ArrayList<>();
+        for (Person p : persons) {
+            calendarList.add(new Calendar(p, getApplicationContext()));
         }
     }
+
 }
