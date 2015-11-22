@@ -1,30 +1,51 @@
 package com.devfest15.blevienna;
 
-
-import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
+import com.estimote.sdk.cloud.internal.User;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TimerTask;
 
 
-public class MonitoringActivity extends AppCompatActivity {
+public class MonitoringActivity extends AppCompatActivity implements CalendarEventDelegate {
     protected static final String TAG = "MonitoringActivity";
 
+    private Realm realm;
+    private List<Calendar> calendarList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ranging);
+        realm = Realm.getInstance(this);
 
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void eventsLoaded(List<String> events) {
+
     }
 
+
+    class MonitorTask extends TimerTask {
+        @Override
+        public void run() {
+            RealmQuery<Person> query = realm.where(Person.class);
+
+            query.isNotNull("accountName");
+
+
+            RealmResults<Person> persons = query.findAllSorted("lastSignalStrength", false);
+            calendarList = new ArrayList<>();
+            for (Person p : persons) {
+                calendarList.add(new Calendar(p, getApplicationContext()));
+            }
+        }
+    }
 }

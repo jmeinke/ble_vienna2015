@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.accounts.AccountManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,6 +29,10 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
     private PersonAdapter personAdapter;
     private String scanId;
     private Realm realm;
+    private Person mSelectedPerson;
+
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
         // Should be invoked in #onCreate.
         beaconManager.setEddystoneListener(this);
     }
+
 
     @Override
     protected void onStart() {
@@ -107,5 +116,38 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
 
         List<Person> pList = new ArrayList<>(persons);
         personAdapter.setPersons(pList);
+    }
+
+    private void onBeaconSelect(Person person) {
+        mSelectedPerson = person;
+        startActivityForResult(
+                Calendar.getCredential(getApplicationContext()).newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+    }
+
+
+    @Override
+    protected void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case REQUEST_ACCOUNT_PICKER:
+                if (resultCode == RESULT_OK && data != null &&
+                        data.getExtras() != null) {
+                    String accountName =
+                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null && mSelectedPerson != null) {
+                        mSelectedPerson.setAccountName(accountName);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(mSelectedPerson);
+                        realm.commitTransaction();
+
+                    }
+                }
+                mSelectedPerson = null;
+
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
