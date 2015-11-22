@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 interface CalendarEventDelegate {
-    void eventsLoaded(List<String> events);
+    void calendarDidLoadEvents(Calendar cal, List<String> events);
 }
 public class Calendar {
     private Person person;
@@ -127,7 +127,7 @@ public class Calendar {
         @Override
         protected void onPostExecute(List<String> output) {
             if (delegate != null) {
-                delegate.eventsLoaded(output);
+                delegate.calendarDidLoadEvents(Calendar.this, output);
             }
         }
 

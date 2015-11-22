@@ -88,19 +88,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
         if (eddystones.isEmpty())
             return;
 
-        for (Eddystone eddystone : eddystones) {
-            // Update the person in our database
-
-            Person person = new Person();
-            person.setMacAddress(eddystone.macAddress.toString());
-            person.setLastSignalStrength(eddystone.rssi);
-            person.setLastSeen(new Date(currentTimeMillis()));
-
-            // Persist your data easily
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(person);
-            realm.commitTransaction();
-        }
+        Person.updatePersons(eddystones, realm);
 
         queryPersonsAndUpdateList();
     }

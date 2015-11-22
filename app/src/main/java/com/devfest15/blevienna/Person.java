@@ -1,11 +1,17 @@
 package com.devfest15.blevienna;
 
 
-import java.util.Date;
+import com.estimote.sdk.eddystone.Eddystone;
 
+import java.util.Date;
+import java.util.List;
+
+import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
+
+import static java.lang.System.currentTimeMillis;
 
 
 /**
@@ -58,5 +64,26 @@ public class Person extends RealmObject {
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+    }
+
+    static void updatePersons(List<Eddystone> eddystones, Realm realm) {
+        realm.beginTransaction();
+
+        realm.where(Person.class).isNull("accountName").findAll().clear();
+        for (Person p : realm.where(Person.class).isNotNull("accountName").findAll()) {
+            p.setLastSignalStrength(Integer.MIN_VALUE);
+        }
+        for (Eddystone eddystone : eddystones) {
+            // Update the person in our database
+
+            Person person = new Person();
+            person.setMacAddress(eddystone.macAddress.toString());
+            person.setLastSignalStrength(eddystone.rssi);
+            person.setLastSeen(new Date(currentTimeMillis()));
+
+            // Persist your data easily
+            realm.copyToRealmOrUpdate(person);
+        }
+        realm.commitTransaction();
     }
 }
