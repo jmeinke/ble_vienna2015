@@ -126,8 +126,8 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
                     String accountName =
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null && mSelectedPerson != null) {
-                        mSelectedPerson.setAccountName(accountName);
                         realm.beginTransaction();
+                        mSelectedPerson.setAccountName(accountName);
                         realm.copyToRealmOrUpdate(mSelectedPerson);
                         realm.commitTransaction();
 
@@ -143,6 +143,13 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
 
     @Override
     public void onItemClick(View v, int position) {
-        
+        Person p = personAdapter.getPerson(position);
+        Person newPerson = new Person();
+        newPerson.setMacAddress(p.getMacAddress());
+        newPerson.setLastSignalStrength(p.getLastSignalStrength());
+        newPerson.setLastSeen(p.getLastSeen());
+        newPerson.setAccountName(p.getAccountName());
+        newPerson.setName(p.getName());
+        onBeaconSelect(newPerson);
     }
 }

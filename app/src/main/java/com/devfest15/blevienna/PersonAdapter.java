@@ -83,6 +83,10 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
         this.listener = listener;
     }
 
+    public Person getPerson(int position) {
+        return persons.get(position);
+    }
+
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
         FrameLayout gl;
