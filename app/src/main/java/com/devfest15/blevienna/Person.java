@@ -12,20 +12,20 @@ import io.realm.annotations.Required;
  * Class description
  */
 public class Person extends RealmObject {
-    @Required // beaconId is not nullable
+    @Required // macAddress is not nullable
     @PrimaryKey
-    private String beaconId;
+    private String macAddress;
     private String name;
     private String accountName;
     private int lastSignalStrength;
     private Date lastSeen;
 
-    public String getBeaconId() {
-        return beaconId;
+    public String getMacAddress() {
+        return macAddress;
     }
 
-    public void setBeaconId(String beaconId) {
-        this.beaconId = beaconId;
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
     }
 
     public String getName() {

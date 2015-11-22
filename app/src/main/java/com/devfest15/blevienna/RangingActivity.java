@@ -1,6 +1,7 @@
 package com.devfest15.blevienna;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,11 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.eddystone.Eddystone;
 import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -20,6 +22,7 @@ import static java.lang.System.currentTimeMillis;
 public class RangingActivity extends AppCompatActivity implements BeaconManager.EddystoneListener {
     protected static final String TAG = "RangingActivity";
     private BeaconManager beaconManager;
+    private PersonAdapter personAdapter;
     private String scanId;
     private Realm realm;
 
@@ -36,8 +39,11 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
 
-        beaconManager = new BeaconManager(this);
+        personAdapter = new PersonAdapter(new ArrayList<Person>());
+        rv.setAdapter(personAdapter);
+        queryPersonsAndUpdateList();
 
+        beaconManager = new BeaconManager(this);
         // Should be invoked in #onCreate.
         beaconManager.setEddystoneListener(this);
     }
@@ -77,14 +83,29 @@ public class RangingActivity extends AppCompatActivity implements BeaconManager.
             // Update the person in our database
 
             Person person = new Person();
-            person.setBeaconId(eddystone.macAddress.toString());
+            person.setMacAddress(eddystone.macAddress.toString());
             person.setLastSignalStrength(eddystone.rssi);
             person.setLastSeen(new Date(currentTimeMillis()));
 
             // Persist your data easily
             realm.beginTransaction();
-            realm.copyToRealm(person);
+            realm.copyToRealmOrUpdate(person);
             realm.commitTransaction();
         }
+
+        queryPersonsAndUpdateList();
+    }
+
+    private void queryPersonsAndUpdateList() {
+        // update our adapter with the new data
+        // Build the query looking at all users:
+        RealmQuery<Person> query = realm.where(Person.class);
+
+        // Execute the query:
+        RealmResults<Person> persons = query.findAll();
+        persons.sort("lastSignalStrength", false);
+
+        List<Person> pList = new ArrayList<>(persons);
+        personAdapter.setPersons(pList);
     }
 }

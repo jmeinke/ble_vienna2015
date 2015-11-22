@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:id="@+id/cv">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -10,7 +11,7 @@
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:id="@+id/person_photo"
             android:src="@drawable/ic_person_blue_grey_900_24dp"
             android:layout_alignParentLeft="true"
@@ -30,9 +31,33 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/person_distance"
+            android:id="@+id/person_account"
             android:layout_toRightOf="@+id/person_photo"
             android:layout_below="@+id/person_name"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/person_mac_address"
+            android:layout_toRightOf="@+id/person_photo"
+            android:layout_below="@+id/person_account"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/person_signal"
+            android:layout_toRightOf="@+id/person_photo"
+            android:layout_below="@+id/person_mac_address"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/person_last_seen"
+            android:layout_toRightOf="@+id/person_photo"
+            android:layout_below="@+id/person_signal"
             />
 
     </RelativeLayout>
