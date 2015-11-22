@@ -100,7 +100,9 @@ public class Person extends RealmObject {
         for (Eddystone eddystone : eddystones) {
             // Update the person in our database
 
-            Person person = new Person();
+
+            Person person = realm.where(Person.class).equalTo("macAddress", eddystone.macAddress.toString()).findFirst();
+            if (person == null) person = new Person();
             person.setMacAddress(eddystone.macAddress.toString());
             person.setLastSignalStrength(eddystone.rssi);
             person.setLastSeen(new Date(currentTimeMillis()));
